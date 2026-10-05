@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<title>Conditionals (translation practice)</title>
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+<style>
+  :root{
+    --bg:#0f1116;
+    --card:#1a1d27;
+    --border:#2b2f3a;
+    --text:#e8e9ee;
+    --muted:#9aa0ad;
+    --accent:#5b8def;
+    --green:#2fbf71;
+    --green-bg:#12321f;
+    --green-text:#c9f6dc;
+    --red:#e6534a;
+    --red-bg:#3a1616;
+    --red-text:#ffd0cc;
+    --input-bg:#12141b;
+  }
+  html[data-theme="light"]{
+    --bg:#f4f5f8;
+    --card:#ffffff;
+    --border:#dfe2ea;
+    --text:#1b1d24;
+    --muted:#6b7180;
+    --accent:#3763d6;
+    --green:#1f9d5c;
+    --green-bg:#e4f8ec;
+    --green-text:#0f5c33;
+    --red:#d63c33;
+    --red-bg:#fdeceb;
+    --red-text:#8a231c;
+    --input-bg:#f9f9fb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:24px 16px 60px;
+    transition:background .2s, color .2s;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{
+    text-align:center;
+    font-size:1.5rem;
+    margin-bottom:4px;
+  }
+  .sub{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.9rem;
+    margin-bottom:20px;
+  }
+  .top-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    padding:10px 0;
+    z-index:5;
+    border-bottom:1px solid var(--border);
+    margin-bottom:16px;
+  }
+  #timer{
+    font-size:1.3rem;
+    font-weight:700;
+    padding:6px 14px;
+    border-radius:8px;
+    background:var(--card);
+    border:1px solid var(--border);
+    min-width:80px;
+    text-align:center;
+  }
+  #timer.warn{color:var(--red);border-color:var(--red);}
+  #score{
+    font-size:1rem;
+    color:var(--muted);
+  }
+  #theme-toggle{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .item{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:12px;
+  }
+  .ru{
+    font-size:1.02rem;
+    margin-bottom:8px;
+  }
+  textarea.answer{
+    width:100%;
+    padding:9px 12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--input-bg);
+    color:var(--text);
+    font-size:0.95rem;
+    outline:none;
+    resize:vertical;
+    min-height:44px;
+    font-family:inherit;
+    transition:background .15s, border-color .15s;
+  }
+  textarea.answer:focus{border-color:var(--accent);}
+  textarea.answer.correct{
+    background:var(--green-bg);
+    border-color:var(--green);
+    color:var(--green-text);
+  }
+  textarea.answer.incorrect{
+    background:var(--red-bg);
+    border-color:var(--red);
+    color:var(--red-text);
+  }
+  textarea.answer:disabled{opacity:0.7;}
+  /* Correct-answer reveal exists for reference but is never shown to the learner */
+  .reveal{
+    display:none !important;
+  }
+  #check-btn{
+    display:block;
+    width:100%;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:13px 18px;
+    border-radius:10px;
+    font-size:1rem;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  #check-btn:hover{opacity:0.9;}
+  #check-btn:disabled{opacity:0.5; cursor:not-allowed;}
+  #finish-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(10,11,15,0.55);
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+  }
+  #finish-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:28px 30px;
+    text-align:center;
+    max-width:340px;
+    color:var(--text);
+  }
+  #finish-emoji{
+    font-size:3rem;
+    line-height:1;
+    margin-bottom:6px;
+  }
+  #finish-box h2{margin-top:0; margin-bottom:4px;}
+  #finish-box p{color:var(--muted);}
+  button.primary{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    font-size:0.95rem;
+    cursor:pointer;
+    margin-top:10px;
+  }
+  button.primary:hover{opacity:0.9;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Conditionals (translation practice)</h1>
+  <p class="sub">Translate each sentence into English, then press Check. You have 5 minutes.</p>
+
+  <div class="top-bar">
+    <div id="timer">05:00</div>
+    <div id="score">0 / 8 correct</div>
+    <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+  </div>
+
+  <div id="quiz"></div>
+  <button id="check-btn" onclick="checkAll()">Check</button>
+</div>
+
+<div id="finish-overlay">
+  <div id="finish-box">
+    <div id="finish-emoji">🔄</div>
+    <h2 id="finish-title">Time's up!</h2>
+    <p id="final-score"></p>
+    <button class="primary" onclick="document.getElementById('finish-overlay').style.display='none'">Okay</button>
+  </div>
+</div>
+
+<script>
+const baseData = [
+  { ru: "Если ты не поторопишься, пропустишь начало встречи.",
+    answers: ["If you don't hurry, you'll miss the start of the meeting."] },
+  { ru: "На твоём месте я бы согласилась на это предложение.",
+    answers: ["If I were you, I'd accept this offer."] },
+  { ru: "Если она мне позвонит, я дам тебе знать.",
+    answers: ["If she calls me, I'll let you know."] },
+  { ru: "Если бы мы жили ближе к офису, мы бы, наверное, чаще туда ходили.",
+    answers: ["If we lived closer to the office, we'd probably go there more often."] },
+  { ru: "Я дам тебе знать, как только что-нибудь узнаю от клиента.",
+    answers: ["I'll let you know as soon as I hear anything from the client."] },
+  { ru: "Если бы не мой страх летать, я бы съездила в Японию.",
+    answers: ["If it weren't for my fear of flying, I'd go to Japan."] },
+  { ru: "Я пойду в спортзал, если закончу работу пораньше.",
+    answers: ["I'll go to the gym if I finish work early."] },
+  { ru: "Он мог бы свободно говорить по-английски, если бы каждый день практиковался.",
+    answers: [
+      "He could speak English fluently if he practiced every day.",
+      "He could speak English fluently if he practised every day."
+    ] }
+];
+
+// Fisher-Yates shuffle so the question order is different every time the page loads
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const data = shuffle(baseData);
+
+const scoreMessages = {
+  8: ["🌟", "Outstanding!"],
+  7: ["🏆", "Excellent work!"],
+  6: ["💪", "Very good!"],
+  5: ["👍", "Good job!"],
+  4: ["🙂", "Solid effort!"],
+  3: ["🔧", "Keep working on it!"],
+  2: ["📚", "More practice needed!"],
+  1: ["🌱", "Keep going!"],
+  0: ["🆘", "Time to start again!"]
+};
+
+// Expands contractions to a canonical full form so that "I'll"/"I will",
+// "I'd"/"I would", "don't"/"do not", "weren't"/"were not" etc. all compare equal.
+// Strips sentence punctuation so missing commas/periods never count against the student,
+// and removes the articles a / an / the anywhere in the sentence so a missing article
+// (or an extra one) never counts against the student either.
+function normalize(str){
+  let s = str.toLowerCase();
+  s = s.replace(/[’‘]/g, "'");
+  s = s.replace(/\bwon't\b/g, "will not");
+  s = s.replace(/\bcan't\b/g, "can not");
+  s = s.replace(/\bshan't\b/g, "shall not");
+  s = s.replace(/n't\b/g, " not");
+  s = s.replace(/'ll\b/g, " will");
+  s = s.replace(/'d\b/g, " would");
+  s = s.replace(/'ve\b/g, " have");
+  s = s.replace(/'re\b/g, " are");
+  s = s.replace(/'m\b/g, " am");
+  s = s.replace(/[.,!?;:"()]/g, "");
+  s = s.replace(/'/g, "");
+  s = s.replace(/\b(a|an|the)\b/g, "");
+  s = s.replace(/\s+/g, " ").trim();
+  return s;
+}
+
+const quizEl = document.getElementById("quiz");
+let correctCount = 0;
+let timeLeft = 300; // 5 minutes
+let timerId = null;
+let finished = false;
+const inputs = [];
+
+data.forEach((item, idx) => {
+  const row = document.createElement("div");
+  row.className = "item";
+  row.id = "item-" + idx;
+
+  const ru = document.createElement("div");
+  ru.className = "ru";
+  ru.textContent = (idx + 1) + ". " + item.ru;
+
+  const input = document.createElement("textarea");
+  input.className = "answer";
+  input.rows = 1;
+  input.placeholder = "Type the English translation...";
+  input.autocomplete = "off";
+
+  // Kept in the DOM for reference/debugging, hidden from the learner via CSS
+  const reveal = document.createElement("div");
+  reveal.className = "reveal";
+  reveal.textContent = "Correct answer: " + item.answers[0];
+
+  // No live validation: colors only change when "Check" is pressed or time runs out
+  input.addEventListener("input", () => {
+    input.classList.remove("correct", "incorrect");
+  });
+
+  row.appendChild(ru);
+  row.appendChild(input);
+  row.appendChild(reveal);
+  quizEl.appendChild(row);
+  inputs.push({ input, item });
+});
+
+function checkAll(){
+  let count = 0;
+  inputs.forEach(({ input, item }) => {
+    const typed = normalize(input.value);
+    if (typed.length === 0){
+      input.classList.remove("correct", "incorrect");
+      return;
+    }
+    const isCorrect = item.answers.some(a => normalize(a) === typed);
+    if (isCorrect){
+      count++;
+      input.classList.add("correct");
+      input.classList.remove("incorrect");
+    } else {
+      input.classList.add("incorrect");
+      input.classList.remove("correct");
+    }
+  });
+  correctCount = count;
+  updateScore();
+}
+
+function updateScore(){
+  document.getElementById("score").textContent = correctCount + " / " + data.length + " correct";
+}
+
+function formatTime(t){
+  const m = Math.floor(t / 60).toString().padStart(2, "0");
+  const s = (t % 60).toString().padStart(2, "0");
+  return m + ":" + s;
+}
+
+function tick(){
+  timeLeft--;
+  const timerEl = document.getElementById("timer");
+  timerEl.textContent = formatTime(Math.max(timeLeft, 0));
+  if (timeLeft <= 10) timerEl.classList.add("warn");
+  if (timeLeft <= 0){
+    clearInterval(timerId);
+    endQuiz();
+  }
+}
+
+function endQuiz(){
+  finished = true;
+  checkAll();
+  inputs.forEach(({ input }) => { input.disabled = true; });
+  document.getElementById("check-btn").disabled = true;
+
+  const [emoji, message] = scoreMessages[correctCount] !== undefined ? scoreMessages[correctCount] : scoreMessages[0];
+  document.getElementById("finish-emoji").textContent = emoji;
+  document.getElementById("finish-title").textContent = message;
+  document.getElementById("final-score").textContent =
+    "You got " + correctCount + " out of " + data.length + " correct.";
+  document.getElementById("finish-overlay").style.display = "flex";
+}
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const btn = document.getElementById("theme-toggle");
+  if (html.getAttribute("data-theme") === "light"){
+    html.removeAttribute("data-theme");
+    btn.textContent = "☀ Light";
+  } else {
+    html.setAttribute("data-theme", "light");
+    btn.textContent = "🌙 Dark";
+  }
+}
+
+timerId = setInterval(tick, 1000);
+</script>
+</body>
+</html>
